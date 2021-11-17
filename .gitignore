@@ -3,4 +3,5 @@ tests/*_diff_*.txt
 virt2phys
 cachesim
 
-
+# Mac file
+.DS_Store
