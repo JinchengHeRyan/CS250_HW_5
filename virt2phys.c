@@ -9,13 +9,12 @@ int virt_add;
 
 int get_log_2(int num)
 {
-    int ans = 0;
-    while (num != 1)
+    int r = 0;
+    while (num >>= 1)
     {
-        num = num >> 1;
-        ans++;
+        r++;
     }
-    return ans;
+    return r;
 }
 
 int main(int argc, char *argv[])
