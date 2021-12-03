@@ -5,3 +5,6 @@ cachesim
 
 # Mac file
 .DS_Store
+
+# VScode files
+.vscode/
