@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     }
 
     int vpn = pagetable[vpn_idx];
-    int phy_add = vpn << offset_bit + offset;
+    int phy_add = (vpn << offset_bit) | offset;
     printf("%x\n", phy_add);
 
     return 0;
