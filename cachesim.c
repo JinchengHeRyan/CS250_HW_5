@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
             if (cache[index][i].tag == tag && cache[index][i].whichWay != -1)
             {
                 isHit = 1;
-                wayIsHit = i;
+                wayIsHit = cache[index][i].whichWay;
                 break;
             }
         }
