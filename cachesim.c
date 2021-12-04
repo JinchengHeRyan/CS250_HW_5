@@ -118,14 +118,14 @@ int main(int argc, char *argv[])
         fscanf(input_file, "%d", &bytes_needed);
 
         // Determine whether it is a hit
-        int offset = address & (1 << offset_bit);
-        int index = (address >> offset_bit) & (1 << index_bit);
+        int offset = address & (((1 << offset_bit) - 1));
+        int index = (address >> offset_bit) & ((1 << index_bit) - 1);
         int tag = address >> (offset_bit + index_bit);
 
         isHit = 0;
         for (int i = 0; i < associativity; i++)
         {
-            if (cache[index][i].tag == tag)
+            if (cache[index][i].tag == tag && cache[index][i].whichWay != -1)
             {
                 isHit = 1;
                 wayIsHit = i;
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
                     {
                         cache[index][i].whichWay++;
                     }
-                    else if (cache[index][i].tag == tag)
+                    else if (cache[index][i].whichWay == wayIsHit)
                     {
                         cache[index][i].whichWay = 0;
                     }
@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
         }
         else
         {
+            // printf("is load\n");
             if (isHit)
             {
                 for (int i = 0; i < associativity; i++)
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
                     {
                         cache[index][i].whichWay++;
                     }
-                    else if (cache[index][i].tag == tag)
+                    else if (cache[index][i].whichWay == wayIsHit)
                     {
                         cache[index][i].whichWay = 0;
                     }
@@ -194,29 +195,33 @@ int main(int argc, char *argv[])
                 {
                     if (cache[index][ass].whichWay == 0)
                     {
-
                         for (int i = 0; i < bytes_needed; i++)
                         {
-                            printf("%02hhx", cache[index][ass].data[i]);
+                            // printf("%02hhx", cache[index][ass].data[i]);
+                            printf("%02hhx", main_mem[address + i]);
                         }
                         printf("\n");
+                        break;
                     }
-                    break;
                 }
             }
             else
             {
+                // printf("did not hit\n");
+                int didPut = 0;
                 for (int i = 0; i < associativity; i++)
                 {
+                    // printf("associativity = %d\n", cache[index][i].whichWay);
                     if (cache[index][i].whichWay > -1 && cache[index][i].whichWay < associativity - 1)
                     {
                         cache[index][i].whichWay++;
                     }
-                    else
+                    else if (!didPut)
                     {
                         cache[index][i].whichWay = 0;
                         cache[index][i].tag = tag;
                         copy_mem(cache[index][i].data, &main_mem[address], bytes_needed);
+                        didPut = 1;
                     }
                 }
 
@@ -224,12 +229,13 @@ int main(int argc, char *argv[])
                 {
                     if (cache[index][i].whichWay == 0)
                     {
-                        printf("%s 0x%x miss", instruction, address);
+                        printf("%s 0x%x miss ", instruction, address);
                         for (int s = 0; s < bytes_needed; s++)
                         {
-                            printf("%02hhx", cache[index][i].data[s]);
+                            // printf("%02hhx", cache[index][i].data[s]);
+                            printf("%02hhx", main_mem[address + s]);
                         }
-
+                        printf("\n");
                         break;
                     }
                 }
