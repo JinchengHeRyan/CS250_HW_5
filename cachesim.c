@@ -133,6 +133,22 @@ int main(int argc, char *argv[])
             }
         }
 
+        // LRU policy when being hitted
+        if (isHit)
+        {
+            for (int i = 0; i < associativity; i++)
+            {
+                if (cache[index][i].whichWay < wayIsHit && cache[index][i].whichWay >= 0)
+                {
+                    cache[index][i].whichWay++;
+                }
+                else if (cache[index][i].whichWay == wayIsHit)
+                {
+                    cache[index][i].whichWay = 0;
+                }
+            }
+        }
+
         // It is a store instruction
         if (isStore(instruction))
         {
@@ -144,20 +160,9 @@ int main(int argc, char *argv[])
                 main_mem[address + i] = input;
             }
 
-            // Deal with LRU
+            // Copy memory
             if (isHit)
             {
-                for (int i = 0; i < associativity; i++)
-                {
-                    if (cache[index][i].whichWay < wayIsHit && cache[index][i].whichWay >= 0)
-                    {
-                        cache[index][i].whichWay++;
-                    }
-                    else if (cache[index][i].whichWay == wayIsHit)
-                    {
-                        cache[index][i].whichWay = 0;
-                    }
-                }
                 for (int i = 0; i < associativity; i++)
                 {
                     if (cache[index][i].whichWay == 0)
@@ -178,20 +183,9 @@ int main(int argc, char *argv[])
         {
             if (isHit)
             {
-                for (int i = 0; i < associativity; i++)
-                {
-                    if (cache[index][i].whichWay < wayIsHit && cache[index][i].whichWay >= 0)
-                    {
-                        cache[index][i].whichWay++;
-                    }
-                    else if (cache[index][i].whichWay == wayIsHit)
-                    {
-                        cache[index][i].whichWay = 0;
-                    }
-                }
-
                 printf("%s 0x%x hit ", instruction, address);
 
+                // Directly load from cache
                 for (int ass = 0; ass < associativity; ass++)
                 {
                     if (cache[index][ass].whichWay == 0)
