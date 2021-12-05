@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
             }
         }
 
+        // It is a store instruction
         if (isStore(instruction))
         {
             // write into main memory
@@ -161,7 +162,7 @@ int main(int argc, char *argv[])
                 {
                     if (cache[index][i].whichWay == 0)
                     {
-                        copy_mem(cache[index][i].data, &main_mem[address], bytes_needed);
+                        copy_mem(cache[index][i].data, &main_mem[address - offset], block_size);
                         break;
                     }
                 }
@@ -172,9 +173,9 @@ int main(int argc, char *argv[])
                 printf("%s 0x%x miss\n", instruction, address);
             }
         }
+        // It is a laod instruction
         else
         {
-            // printf("is load\n");
             if (isHit)
             {
                 for (int i = 0; i < associativity; i++)
@@ -197,8 +198,7 @@ int main(int argc, char *argv[])
                     {
                         for (int i = 0; i < bytes_needed; i++)
                         {
-                            // printf("%02hhx", cache[index][ass].data[i]);
-                            printf("%02hhx", main_mem[address + i]);
+                            printf("%02hhx", cache[index][ass].data[offset + i]);
                         }
                         printf("\n");
                         break;
@@ -207,11 +207,9 @@ int main(int argc, char *argv[])
             }
             else
             {
-                // printf("did not hit\n");
                 int didPut = 0;
                 for (int i = 0; i < associativity; i++)
                 {
-                    // printf("associativity = %d\n", cache[index][i].whichWay);
                     if (cache[index][i].whichWay > -1 && cache[index][i].whichWay < associativity - 1)
                     {
                         cache[index][i].whichWay++;
@@ -220,7 +218,7 @@ int main(int argc, char *argv[])
                     {
                         cache[index][i].whichWay = 0;
                         cache[index][i].tag = tag;
-                        copy_mem(cache[index][i].data, &main_mem[address], bytes_needed);
+                        copy_mem(cache[index][i].data, &main_mem[address - offset], block_size);
                         didPut = 1;
                     }
                 }
@@ -232,8 +230,7 @@ int main(int argc, char *argv[])
                         printf("%s 0x%x miss ", instruction, address);
                         for (int s = 0; s < bytes_needed; s++)
                         {
-                            // printf("%02hhx", cache[index][i].data[s]);
-                            printf("%02hhx", main_mem[address + s]);
+                            printf("%02hhx", cache[index][i].data[offset + s]);
                         }
                         printf("\n");
                         break;
